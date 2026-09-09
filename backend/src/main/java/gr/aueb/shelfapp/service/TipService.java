@@ -46,7 +46,14 @@ public class TipService {
     private static final List<String> GENERAL_TIPS = List.of(
             "Food waste is one of the easiest ways to waste money without noticing it - every saved product counts!",
             "Around a third of all food produced worldwide is wasted - using up what you already have really helps.",
-            "Planning meals around what's about to expire is one of the simplest habits that actually saves money."
+            "Planning meals around what's about to expire is one of the simplest habits that actually saves money.",
+            "A quick weekly check of your pantry takes two minutes and can save you from tossing out forgotten items.",
+            "Rotting food in landfills produces methane, a potent greenhouse gas - using it up helps the planet too.",
+            "\"First in, first out\": move older items to the front of the shelf so they get used before newer ones.",
+            "Buying only what you'll realistically use is the single biggest lever against food waste at home.",
+            "Not sure if something's still good? Trust your senses - many foods are fine well past their printed date.",
+            "Leftovers count too - a small container of yesterday's dinner is one less product wasted today.",
+            "Batch-cooking food that's about to expire and freezing portions is an easy way to stop the clock on it."
     );
 
     private final CategoryRepository categoryRepository;
@@ -58,6 +65,24 @@ public class TipService {
 
     /** categoryId is optional - null (or an unrecognized category) falls back to a general tip. */
     public TipDto randomTip(Long categoryId) {
+        Pool resolved = resolvePool(categoryId);
+        String message = resolved.pool().get(random.nextInt(resolved.pool().size()));
+        return new TipDto(resolved.categoryName(), message);
+    }
+
+    /**
+     * The whole set of tips for a category (or the general set, if categoryId
+     * is null/unrecognized) - so the frontend can cycle through all of them
+     * without repeating one until every tip in the set has been shown.
+     */
+    public List<TipDto> allTips(Long categoryId) {
+        Pool resolved = resolvePool(categoryId);
+        return resolved.pool().stream()
+                .map(message -> new TipDto(resolved.categoryName(), message))
+                .toList();
+    }
+
+    private Pool resolvePool(Long categoryId) {
         String categoryName = null;
         List<String> pool = GENERAL_TIPS;
 
@@ -72,7 +97,9 @@ public class TipService {
             }
         }
 
-        String message = pool.get(random.nextInt(pool.size()));
-        return new TipDto(categoryName, message);
+        return new Pool(categoryName, pool);
+    }
+
+    private record Pool(String categoryName, List<String> pool) {
     }
 }

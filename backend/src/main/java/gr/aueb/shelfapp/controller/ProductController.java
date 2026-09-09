@@ -21,8 +21,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Every endpoint here works on "my" products.
- * A product can only be viewed/changed by the user who owns it.
+ * Every endpoint here works on "my" products - the current user is read
+ * from the JWT (via CurrentUserProvider), never trusted from the client.
+ * Also: a product can only be viewed/changed by the user who owns it
+ * (see ProductService.getOwnedOrThrow) - that's the "authorization" half,
+ * on top of "authentication".
  */
 @RestController
 @RequestMapping("/api/products")
@@ -67,10 +70,15 @@ public class ProductController {
         return productService.updateStatus(id, request.status(), currentUserProvider.getCurrentUserId());
     }
 
-    /** Feature #2: recipe ideas for this product's category, so it gets used before it expires. */
+    /**
+     * Feature #2: recipe ideas for this product, so it gets used before it
+     * expires. Tailored to the product itself (e.g. "milk" vs "cheese"
+     * within Dairy) where we have something specific, falling back to a
+     * category-wide suggestion otherwise.
+     */
     @GetMapping("/{id}/recipes")
     public List<RecipeDto> getRecipesFor(@PathVariable Long id) {
         ProductDto product = productService.findById(id, currentUserProvider.getCurrentUserId());
-        return recipeService.forCategory(product.categoryName());
+        return recipeService.forProduct(product.categoryName(), product.name());
     }
 }

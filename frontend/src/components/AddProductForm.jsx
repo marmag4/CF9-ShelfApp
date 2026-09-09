@@ -61,7 +61,7 @@ export default function AddProductForm({ categories, onProductAdded }) {
           <input
             className="input"
             type="number"
-            step="0.5"
+            step="0.1"
             min="0"
             name="quantity"
             value={form.quantity}

@@ -263,7 +263,7 @@ function ProductRow({ product, onChanged, sharingPoints, categories }) {
                   <input
                     className="input"
                     type="number"
-                    step="0.5"
+                    step="0.1"
                     min="0"
                     name="quantity"
                     value={editForm.quantity}
@@ -341,7 +341,7 @@ function ProductRow({ product, onChanged, sharingPoints, categories }) {
 export default function ProductList({ products, onChanged, sharingPoints, categories }) {
   return (
     <div className="card">
-      <p className="card-title">Pantry items</p>
+      <p className="card-title">Your pantry</p>
       {products.length === 0 ? (
         <p className="table-empty">No products yet — add your first one above.</p>
       ) : (
