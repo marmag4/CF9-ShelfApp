@@ -1,4 +1,5 @@
-# CF9 - ShelfApp
+# CF9
+Final Project ShelfApp
 
 A household pantry tracker — Coding Factory 10 (AUEB) final project.
 
